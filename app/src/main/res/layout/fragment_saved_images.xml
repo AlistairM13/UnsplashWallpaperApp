@@ -5,10 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.SavedImagesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSavedImages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Saved images" />
-
+        android:layout_height="match_parent" />
 </FrameLayout>

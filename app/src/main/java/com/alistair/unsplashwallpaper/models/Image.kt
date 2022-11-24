@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 data class Image(
     @PrimaryKey(autoGenerate = true)
     var dbId: Int? = null,
-    val description: String,
-    val likes: Int,
+    val description: String = "No Description Provided",
+//    val likes: Int, // sort by likes feature later on
     val links: Link,
     val urls: Url,
 )
