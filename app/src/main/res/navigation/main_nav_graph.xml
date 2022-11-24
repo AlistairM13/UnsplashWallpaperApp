@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/allImagesFragment">
+
+    <fragment
+        android:id="@+id/allImagesFragment"
+        android:name="com.alistair.unsplashwallpaper.ui.fragments.AllImagesFragment"
+        android:label="fragment_all_images"
+        tools:layout="@layout/fragment_all_images" >
+        <action
+            android:id="@+id/action_allImagesFragment_to_detailImageFragment"
+            app:destination="@id/detailImageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchImagesFragment"
+        android:name="com.alistair.unsplashwallpaper.ui.fragments.SearchImagesFragment"
+        android:label="fragment_search_images"
+        tools:layout="@layout/fragment_search_images" >
+        <action
+            android:id="@+id/action_searchImagesFragment_to_detailImageFragment"
+            app:destination="@id/detailImageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/savedImagesFragment"
+        android:name="com.alistair.unsplashwallpaper.ui.fragments.SavedImagesFragment"
+        android:label="fragment_saved_images"
+        tools:layout="@layout/fragment_saved_images" >
+        <action
+            android:id="@+id/action_savedImagesFragment_to_detailImageFragment"
+            app:destination="@id/detailImageFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailImageFragment"
+        android:name="com.alistair.unsplashwallpaper.ui.fragments.DetailImageFragment"
+        android:label="fragment_detail_image"
+        tools:layout="@layout/fragment_detail_image" />
+</navigation>

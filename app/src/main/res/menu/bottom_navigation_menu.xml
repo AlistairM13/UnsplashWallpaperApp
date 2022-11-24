@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/allImagesFragment"
+        android:icon="@drawable/ic_image"
+        android:title="All Images" />
+
+    <item
+        android:id="@+id/searchImagesFragment"
+        android:icon="@drawable/ic_image_search"
+        android:title="Search Images" />
+
+    <item
+        android:id="@+id/savedImagesFragment"
+        android:icon="@drawable/ic_favorite"
+        android:title="Saved Images" />
+</menu>
