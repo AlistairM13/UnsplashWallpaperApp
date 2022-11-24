@@ -1,6 +1,6 @@
 package com.alistair.unsplashwallpaper.models
 
-class UnsplashResponse : ArrayList<Image>()
 
-
-
+data class Url(
+    val regular: String
+)
