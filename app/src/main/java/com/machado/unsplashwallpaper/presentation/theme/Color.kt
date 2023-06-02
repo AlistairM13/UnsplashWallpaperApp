@@ -1,4 +1,4 @@
-package com.machado.unsplashwallpaper.presentation.ui.theme
+package com.machado.unsplashwallpaper.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
