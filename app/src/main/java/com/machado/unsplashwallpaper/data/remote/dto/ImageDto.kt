@@ -1,6 +1,7 @@
 package com.machado.unsplashwallpaper.data.remote.dto
 
 import com.machado.unsplashwallpaper.data.db.entities.ImageEntity
+import com.machado.unsplashwallpaper.domain.model.ImageModel
 
 data class ImageDto(
     val blur_hash: String,
@@ -20,6 +21,12 @@ data class ImageDto(
 ) {
     fun toImageEntity(): ImageEntity {
         return ImageEntity(
+            id = id,
+            url = urls.regular
+        )
+    }
+    fun toImageModel():ImageModel{
+        return ImageModel(
             id = id,
             url = urls.regular
         )

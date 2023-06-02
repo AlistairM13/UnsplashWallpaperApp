@@ -5,12 +5,15 @@ import androidx.room.Room
 import com.google.gson.GsonBuilder
 import com.machado.unsplashwallpaper.data.db.UnsplashDatabase
 import com.machado.unsplashwallpaper.data.remote.UnsplashService
+import com.machado.unsplashwallpaper.data.repository_Impl.UnsplashRepositoryImpl
+import com.machado.unsplashwallpaper.domain.repository.UnsplashRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 
@@ -35,5 +38,24 @@ object UnsplashModule {
             UnsplashDatabase::class.java,
             "unsplash_db"
         ).build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("api_key")
+    fun providesApiKey(): String {
+        return "pmtX7wGq-0F-aGyjxop_J0Ki5cTrs-1mZLeQPudEntE"
+    }
+
+    @Provides
+    @Singleton
+    fun providesUnsplashRepository(
+        api: UnsplashService,
+        db: UnsplashDatabase
+    ): UnsplashRepository {
+        return UnsplashRepositoryImpl(
+            api = api,
+            dao = db.dao
+        )
     }
 }

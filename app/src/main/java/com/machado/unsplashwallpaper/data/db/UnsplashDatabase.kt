@@ -6,7 +6,8 @@ import com.machado.unsplashwallpaper.data.db.entities.ImageEntity
 
 @Database(
     entities = [ImageEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class UnsplashDatabase : RoomDatabase() {
     abstract val dao: UnsplashDao
