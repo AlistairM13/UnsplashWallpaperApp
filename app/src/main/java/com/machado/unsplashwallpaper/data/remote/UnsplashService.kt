@@ -10,7 +10,8 @@ interface UnsplashService {
     @GET("/photos")
     suspend fun getImageList(
         @Query("client_id") apiKey: String,
-        @Query("page") page: Int = 1
+        @Query("page") page: Int = 1,
+        @Query("order_by") order_by:String = "popular"
     ): Response<List<ImageDto>>
 
     @GET("/search/photos")

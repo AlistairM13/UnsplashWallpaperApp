@@ -25,6 +25,7 @@ class UnsplashViewModel @Inject constructor(
 
     var isLoading by mutableStateOf(false)
     var imageList by mutableStateOf<List<ImageModel>>(emptyList())
+    var isSaved by mutableStateOf<Boolean>(false)
 
     // For one time events like showing snackBar
     private val _eventFlow = MutableSharedFlow<UIEvent>()
@@ -51,6 +52,20 @@ class UnsplashViewModel @Inject constructor(
             e.printStackTrace()
             _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
         }
+    }
+
+    fun saveImage(imageModel: ImageModel) = viewModelScope.launch {
+        isSaved = if (isSaved) {
+            repository.unSaveImage(imageModel.toImageEntity())
+            false
+        } else {
+            repository.saveImage(imageModel.toImageEntity())
+            true
+        }
+    }
+
+    fun downloadImage(imageModel: ImageModel) {
+
     }
 
     sealed class UIEvent {

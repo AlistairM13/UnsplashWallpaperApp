@@ -15,7 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +29,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.presentation.favorites_screen.FavoritesScreen
 import com.machado.unsplashwallpaper.presentation.theme.UnsplashWallpaperTheme
 import com.machado.unsplashwallpaper.presentation.wallpaper_detail_screen.WallpaperDetailScreen
@@ -45,13 +49,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         setContent {
-            UnsplashWallpaperTheme {
+            var isDetailScreen by remember { mutableStateOf(false) }
+            UnsplashWallpaperTheme{
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
                 val viewModel: UnsplashViewModel = hiltViewModel()
                 val snackBarHostState = remember { SnackbarHostState() }
-
+                var selectedImage by remember { mutableStateOf<ImageModel?>(null) }
                 LaunchedEffect(key1 = true) {
                     viewModel.eventFlow.collectLatest { event ->
                         when (event) {
@@ -64,18 +70,43 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                var showBottomBar by rememberSaveable { mutableStateOf(true) }
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+                showBottomBar = when (navBackStackEntry?.destination?.route) {
+                    Screens.WallpaperDetailScreens.route -> false // on this screen bottom bar should be hidden
+                    else -> true // in all other cases show bottom bar
+                }
+
                 Scaffold(
-                    snackbarHost = { SnackbarHost(hostState = snackBarHostState)},
-                    bottomBar = { BottomNavigationBar(navController = navController) }
+                    snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+                    bottomBar = { if (showBottomBar) BottomNavigationBar(navController = navController) }
                 ) { innerPadding ->
                     NavHost(
                         navController,
                         startDestination = Screens.WallpaperListScreens.route,
                         Modifier.padding(innerPadding)
                     ) {
-                        composable(Screens.WallpaperListScreens.route) { WallpaperListScreen(navController) }
+                        composable(Screens.WallpaperListScreens.route) {
+                            WallpaperListScreen(
+                                navController
+                            ) {
+                                selectedImage = it
+                            }
+                        }
                         composable(Screens.FavoritesScreens.route) { FavoritesScreen(navController) }
-                        composable(Screens.WallpaperDetailScreens.route) { WallpaperDetailScreen() }
+                        composable(Screens.WallpaperDetailScreens.route) {
+                            WallpaperDetailScreen(
+                                selectedImage = selectedImage,
+                                saveImage = { imageToBeSaved ->
+                                    viewModel.saveImage(imageToBeSaved)
+                                },
+                                downloadImage = { imageToBeDownloaded ->
+                                    viewModel.downloadImage(imageToBeDownloaded)
+                                },
+                                isSaved = viewModel.isSaved,
+                            )
+                        }
                     }
                 }
             }
