@@ -1,5 +1,6 @@
 package com.machado.unsplashwallpaper.presentation
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.domain.repository.UnsplashRepository
+import com.machado.unsplashwallpaper.util.AndroidDownloader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -64,8 +66,9 @@ class UnsplashViewModel @Inject constructor(
         }
     }
 
-    fun downloadImage(imageModel: ImageModel) {
-
+    fun downloadImage(imageModel: ImageModel, context: Context) {
+        val downloader = AndroidDownloader(context)
+        downloader.downloadFile(imageModel.downloadUrl, imageModel.id)
     }
 
     sealed class UIEvent {

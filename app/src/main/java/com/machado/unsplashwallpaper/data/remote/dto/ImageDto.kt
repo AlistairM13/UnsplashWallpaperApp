@@ -25,10 +25,19 @@ data class ImageDto(
             url = urls.regular
         )
     }
-    fun toImageModel():ImageModel{
+
+    fun toImageModel(): ImageModel {
         return ImageModel(
             id = id,
-            url = urls.regular
+            url = urls.regular,
+            downloadUrl = getDownloadUrl()
         )
+    }
+
+    fun getDownloadUrl(): String {
+        val url = urls.regular
+        val imageId = id
+        val createdBy = user.name.lowercase().split(" ").joinToString("-")
+        return "$url&dl=$createdBy-$imageId-unsplash.jpg"
     }
 }

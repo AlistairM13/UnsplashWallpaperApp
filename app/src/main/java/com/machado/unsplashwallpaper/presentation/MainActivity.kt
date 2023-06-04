@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             var isDetailScreen by remember { mutableStateOf(false) }
-            UnsplashWallpaperTheme{
+            UnsplashWallpaperTheme {
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
                 val viewModel: UnsplashViewModel = hiltViewModel()
@@ -102,7 +102,7 @@ class MainActivity : ComponentActivity() {
                                     viewModel.saveImage(imageToBeSaved)
                                 },
                                 downloadImage = { imageToBeDownloaded ->
-                                    viewModel.downloadImage(imageToBeDownloaded)
+                                    viewModel.downloadImage(imageToBeDownloaded, applicationContext)
                                 },
                                 isSaved = viewModel.isSaved,
                             )
