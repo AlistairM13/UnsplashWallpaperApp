@@ -17,18 +17,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.presentation.Screens
 import com.machado.unsplashwallpaper.presentation.UnsplashViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun WallpaperListScreen(navController: NavHostController, onClick: (ImageModel) -> Unit) {
-    val viewModel: UnsplashViewModel = hiltViewModel()
+fun WallpaperListScreen(navController: NavHostController,viewModel: UnsplashViewModel) {
+
     val images = viewModel.imageList
     val isLoading = viewModel.isLoading
     Box(modifier = Modifier.fillMaxSize()) {
@@ -47,7 +45,7 @@ fun WallpaperListScreen(navController: NavHostController, onClick: (ImageModel) 
                         .padding(4.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
-                            onClick(it)
+                            viewModel.setSelectedImage(it)
                             navController.navigate(Screens.WallpaperDetailScreens.route)
                         }
                 )

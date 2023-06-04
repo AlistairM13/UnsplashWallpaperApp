@@ -29,7 +29,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.presentation.favorites_screen.FavoritesScreen
 import com.machado.unsplashwallpaper.presentation.theme.UnsplashWallpaperTheme
 import com.machado.unsplashwallpaper.presentation.wallpaper_detail_screen.WallpaperDetailScreen
@@ -48,16 +47,12 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         setContent {
-            var isDetailScreen by remember { mutableStateOf(false) }
             UnsplashWallpaperTheme {
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
                 val viewModel: UnsplashViewModel = hiltViewModel()
                 val snackBarHostState = remember { SnackbarHostState() }
-                var selectedImage by remember { mutableStateOf<ImageModel?>(null) }
                 LaunchedEffect(key1 = true) {
                     viewModel.eventFlow.collectLatest { event ->
                         when (event) {
@@ -89,22 +84,19 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(Screens.WallpaperListScreens.route) {
                             WallpaperListScreen(
-                                navController
-                            ) {
-                                selectedImage = it
-                            }
+                                navController,
+                                viewModel
+                            )
                         }
-                        composable(Screens.FavoritesScreens.route) { FavoritesScreen(navController) }
+                        composable(Screens.FavoritesScreens.route) {
+                            FavoritesScreen(
+                                navController,
+                                viewModel
+                            )
+                        }
                         composable(Screens.WallpaperDetailScreens.route) {
                             WallpaperDetailScreen(
-                                selectedImage = selectedImage,
-                                saveImage = { imageToBeSaved ->
-                                    viewModel.saveImage(imageToBeSaved)
-                                },
-                                downloadImage = { imageToBeDownloaded ->
-                                    viewModel.downloadImage(imageToBeDownloaded, applicationContext)
-                                },
-                                isSaved = viewModel.isSaved,
+                                viewModel = viewModel
                             )
                         }
                     }

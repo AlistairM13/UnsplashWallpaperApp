@@ -20,4 +20,7 @@ interface UnsplashDao {
     @Query("SELECT * FROM ImageEntity")
     fun getSavedImages(): Flow<List<ImageEntity>>
 
+    @Query("SELECT * FROM ImageEntity WHERE id=:imageId")
+    suspend fun getImageById(imageId: String): ImageEntity?
+
 }

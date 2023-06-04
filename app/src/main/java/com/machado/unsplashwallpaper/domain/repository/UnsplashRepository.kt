@@ -17,4 +17,6 @@ interface UnsplashRepository {
     suspend fun unSaveImage(imageEntity: ImageEntity)
 
     fun getSavedImages(): Flow<List<ImageEntity>>
+
+    suspend fun getImageById(imageId: String): ImageEntity?
 }

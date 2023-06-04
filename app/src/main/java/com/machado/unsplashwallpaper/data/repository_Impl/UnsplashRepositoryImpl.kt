@@ -27,4 +27,6 @@ class UnsplashRepositoryImpl @Inject constructor(
     override suspend fun unSaveImage(imageEntity: ImageEntity) = dao.unSaveImage(imageEntity)
 
     override fun getSavedImages(): Flow<List<ImageEntity>> = dao.getSavedImages()
+
+    override suspend fun getImageById(imageId: String): ImageEntity? = dao.getImageById(imageId)
 }

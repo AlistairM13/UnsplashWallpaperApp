@@ -18,25 +18,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.machado.unsplashwallpaper.R
-import com.machado.unsplashwallpaper.domain.model.ImageModel
+import com.machado.unsplashwallpaper.presentation.UnsplashViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun WallpaperDetailScreen(
-    selectedImage: ImageModel?,
-    saveImage: (ImageModel) -> Unit,
-    downloadImage: (ImageModel) -> Unit,
-    isSaved: Boolean,
+    viewModel: UnsplashViewModel
 ) {
+    val isSaved = viewModel.isSaved
+    val selectedImage = viewModel.selectedImage
+    val context = LocalContext.current
+
     Box(modifier = Modifier.fillMaxSize()) {
-        selectedImage?.let {
+        selectedImage.value?.let {
             GlideImage(
-                model = selectedImage.url,
+                model = it.url,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
@@ -69,7 +71,7 @@ fun WallpaperDetailScreen(
                             .height(40.dp)
                             .width(40.dp)
                             .clickable {
-                                saveImage(selectedImage)
+                                viewModel.saveImage(it)
                             }
                     )
                     Image(
@@ -80,7 +82,7 @@ fun WallpaperDetailScreen(
                             .height(40.dp)
                             .width(40.dp)
                             .clickable {
-                                downloadImage(selectedImage)
+                                viewModel.downloadImage(it, context)
                             }
                     )
                 }

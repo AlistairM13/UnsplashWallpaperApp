@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.machado.unsplashwallpaper.data.db.entities.ImageEntity
 import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.domain.repository.UnsplashRepository
 import com.machado.unsplashwallpaper.util.AndroidDownloader
@@ -13,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -33,8 +35,23 @@ class UnsplashViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UIEvent>()
     val eventFlow: SharedFlow<UIEvent> = _eventFlow.asSharedFlow()
 
+    var selectedImage = mutableStateOf<ImageModel?>(null)
+
+    fun setSelectedImage(imageModel: ImageModel) = viewModelScope.launch {
+        selectedImage.value = imageModel
+        isSaved = repository.getImageById(imageModel.id) != null
+    }
+
+    var imagesFromDb = mutableStateOf<List<ImageEntity>>(emptyList())
+
+
     init {
         getImages()
+        viewModelScope.launch {
+            repository.getSavedImages().collectLatest {
+                imagesFromDb.value = it
+            }
+        }
     }
 
     private fun getImages(page: Int = 1) = viewModelScope.launch {
@@ -56,9 +73,11 @@ class UnsplashViewModel @Inject constructor(
         }
     }
 
+
     fun saveImage(imageModel: ImageModel) = viewModelScope.launch {
-        isSaved = if (isSaved) {
-            repository.unSaveImage(imageModel.toImageEntity())
+        val savedImage = repository.getImageById(imageModel.id)
+        isSaved = if (savedImage != null) {
+            repository.unSaveImage(savedImage)
             false
         } else {
             repository.saveImage(imageModel.toImageEntity())
