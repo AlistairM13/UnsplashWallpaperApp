@@ -21,6 +21,8 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Named
 
+const val PAGE_SIZE = 10
+
 @HiltViewModel
 class UnsplashViewModel @Inject constructor(
     val repository: UnsplashRepository,
@@ -37,11 +39,6 @@ class UnsplashViewModel @Inject constructor(
 
     var selectedImage = mutableStateOf<ImageModel?>(null)
 
-    fun setSelectedImage(imageModel: ImageModel) = viewModelScope.launch {
-        selectedImage.value = imageModel
-        isSaved = repository.getImageById(imageModel.id) != null
-    }
-
     var imagesFromDb = mutableStateOf<List<ImageEntity>>(emptyList())
 
 
@@ -54,24 +51,25 @@ class UnsplashViewModel @Inject constructor(
         }
     }
 
-    private fun getImages(page: Int = 1) = viewModelScope.launch {
-        isLoading = true
-        try {
-            val response = repository.getImagesFromApi(apiKey, page)
-            response.body()?.let { images ->
+    fun getImages(page: Int = 1, orderBy: ImageListOrder = ImageListOrder.POPULAR) =
+        viewModelScope.launch {
+            isLoading = true
+            try {
+                val response = repository.getImagesFromApi(apiKey, page, orderBy)
+                response.body()?.let { images ->
+                    isLoading = false
+                    imageList = images.map { it.toImageModel() }
+                }
+            } catch (e: HttpException) {
                 isLoading = false
-                imageList = images.map { it.toImageModel() }
+                e.printStackTrace()
+                _eventFlow.emit(UIEvent.ShowSnackBar("Something went wrong"))
+            } catch (e: IOException) {
+                isLoading = false
+                e.printStackTrace()
+                _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
             }
-        } catch (e: HttpException) {
-            isLoading = false
-            e.printStackTrace()
-            _eventFlow.emit(UIEvent.ShowSnackBar("Something went wrong"))
-        } catch (e: IOException) {
-            isLoading = false
-            e.printStackTrace()
-            _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
         }
-    }
 
 
     fun saveImage(imageModel: ImageModel) = viewModelScope.launch {
@@ -90,7 +88,64 @@ class UnsplashViewModel @Inject constructor(
         downloader.downloadFile(imageModel.downloadUrl, imageModel.id)
     }
 
+    fun setSelectedImage(imageModel: ImageModel) = viewModelScope.launch {
+        selectedImage.value = imageModel
+        isSaved = repository.getImageById(imageModel.id) != null
+    }
+
+    val page = mutableStateOf(1)
+    private var imageScrollPosition = 0
+
+    private fun incrementPage() {
+        page.value = page.value + 1
+    }
+
+    fun onChangeScrollPosition(position: Int) {
+        imageScrollPosition = position
+    }
+
+    private fun appendImages(images: List<ImageModel>) {
+        val current = ArrayList(this.imageList)
+        current.addAll(images)
+        this.imageList = current
+    }
+
+    fun nextPage(orderBy: ImageListOrder = ImageListOrder.POPULAR) = viewModelScope.launch {
+        if ((imageScrollPosition + 1) >= (page.value * PAGE_SIZE)) {
+            isLoading = true
+            incrementPage()
+            if (page.value > 1) {
+                try {
+                    val response = repository.getImagesFromApi(apiKey, page.value, orderBy)
+                    response.body()?.let { images ->
+                        appendImages(images.map { it.toImageModel() })
+                        isLoading = false
+                    }
+                } catch (e: HttpException) {
+                    isLoading = false
+                    e.printStackTrace()
+                    _eventFlow.emit(UIEvent.ShowSnackBar("Something went wrong"))
+                } catch (e: IOException) {
+                    isLoading = false
+                    e.printStackTrace()
+                    _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
+                }
+            }
+        }
+    }
+
+    fun resetImageState() {
+        page.value = 1
+        onChangeScrollPosition(0)
+    }
+
     sealed class UIEvent {
         data class ShowSnackBar(val message: String) : UIEvent()
+    }
+
+    enum class ImageListOrder(val orderByString: String) {
+        LATEST("latest"),
+        OLDEST("oldest"),
+        POPULAR("popular"),
     }
 }

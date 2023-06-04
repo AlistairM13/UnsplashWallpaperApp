@@ -6,12 +6,11 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface UnsplashService {
-
     @GET("/photos")
     suspend fun getImageList(
         @Query("client_id") apiKey: String,
         @Query("page") page: Int = 1,
-        @Query("order_by") order_by:String = "popular"
+        @Query("order_by") orderBy: String = "popular"
     ): Response<List<ImageDto>>
 
     @GET("/search/photos")

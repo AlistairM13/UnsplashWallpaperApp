@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -20,24 +20,34 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.machado.unsplashwallpaper.presentation.PAGE_SIZE
 import com.machado.unsplashwallpaper.presentation.Screens
 import com.machado.unsplashwallpaper.presentation.UnsplashViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun WallpaperListScreen(navController: NavHostController,viewModel: UnsplashViewModel) {
+fun WallpaperListScreen(
+    navController: NavHostController,
+    viewModel: UnsplashViewModel,
+    orderBy: UnsplashViewModel.ImageListOrder
+) {
 
     val images = viewModel.imageList
     val isLoading = viewModel.isLoading
+    val page = viewModel.page.value
     Box(modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
 
         LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Fixed(2)) {
-            items(images) {
+            itemsIndexed(images) { index, image ->
+                viewModel.onChangeScrollPosition(index)
+                if ((index + 1) >= (page * PAGE_SIZE) && !isLoading) {
+                    viewModel.nextPage(orderBy)
+                }
                 GlideImage(
-                    model = it.url,
+                    model = image.url,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -45,7 +55,7 @@ fun WallpaperListScreen(navController: NavHostController,viewModel: UnsplashView
                         .padding(4.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
-                            viewModel.setSelectedImage(it)
+                            viewModel.setSelectedImage(image)
                             navController.navigate(Screens.WallpaperDetailScreens.route)
                         }
                 )

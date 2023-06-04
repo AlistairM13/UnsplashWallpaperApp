@@ -5,6 +5,7 @@ import com.machado.unsplashwallpaper.data.db.entities.ImageEntity
 import com.machado.unsplashwallpaper.data.remote.UnsplashService
 import com.machado.unsplashwallpaper.data.remote.dto.ImageDto
 import com.machado.unsplashwallpaper.domain.repository.UnsplashRepository
+import com.machado.unsplashwallpaper.presentation.UnsplashViewModel
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import javax.inject.Inject
@@ -13,8 +14,8 @@ class UnsplashRepositoryImpl @Inject constructor(
     val api: UnsplashService,
     val dao: UnsplashDao
 ) : UnsplashRepository {
-    override suspend fun getImagesFromApi(apiKey: String, page: Int): Response<List<ImageDto>> =
-        api.getImageList(apiKey, page)
+    override suspend fun getImagesFromApi(apiKey: String, page: Int, orderBy: UnsplashViewModel.ImageListOrder): Response<List<ImageDto>> =
+        api.getImageList(apiKey, page, orderBy.orderByString)
 
     override suspend fun searchImages(
         apiKey: String,
