@@ -48,9 +48,6 @@ fun WallpaperSearchScreen(navController: NavHostController, viewModel: UnsplashV
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
         if (viewModel.searchQuery.isNotBlank() && searchResults.isEmpty() && !isLoading) {
             Text(text = "No Results found", modifier = Modifier.align(Alignment.Center))
         }
@@ -92,6 +89,9 @@ fun WallpaperSearchScreen(navController: NavHostController, viewModel: UnsplashV
                     )
                 }
             }
+        }
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }

@@ -49,7 +49,7 @@ fun UnsplashWallpaperTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = Color.Black.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
 

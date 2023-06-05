@@ -36,10 +36,6 @@ fun WallpaperListScreen(
     val isLoading = viewModel.isLoading
     val page = viewModel.page.value
     Box(modifier = Modifier.fillMaxSize()) {
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
-
         LazyVerticalStaggeredGrid(columns = StaggeredGridCells.Fixed(2)) {
             itemsIndexed(images) { index, image ->
                 viewModel.onChangeScrollPosition(index)
@@ -60,6 +56,9 @@ fun WallpaperListScreen(
                         }
                 )
             }
+        }
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
 }
