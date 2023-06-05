@@ -1,6 +1,7 @@
 package com.machado.unsplashwallpaper.data.remote
 
 import com.machado.unsplashwallpaper.data.remote.dto.ImageDto
+import com.machado.unsplashwallpaper.data.remote.dto.SearchResult
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -16,8 +17,8 @@ interface UnsplashService {
     @GET("/search/photos")
     suspend fun searchImage(
         @Query("client_id") apiKey: String,
-        query: String,
+        @Query("query") query: String,
         @Query("page") page: Int = 1
-    ): Response<List<ImageDto>>
+    ): Response<SearchResult>
 
 }

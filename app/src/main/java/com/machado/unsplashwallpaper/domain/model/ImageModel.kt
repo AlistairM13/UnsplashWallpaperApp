@@ -10,7 +10,8 @@ data class ImageModel(
     fun toImageEntity(): ImageEntity {
         return ImageEntity(
             id = id,
-            url = url
+            url = url,
+            downloadUrl = downloadUrl
         )
     }
 }

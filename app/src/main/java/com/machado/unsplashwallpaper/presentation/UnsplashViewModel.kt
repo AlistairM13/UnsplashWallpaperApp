@@ -11,6 +11,8 @@ import com.machado.unsplashwallpaper.domain.model.ImageModel
 import com.machado.unsplashwallpaper.domain.repository.UnsplashRepository
 import com.machado.unsplashwallpaper.util.AndroidDownloader
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -134,9 +136,81 @@ class UnsplashViewModel @Inject constructor(
         }
     }
 
+    // search
+    val searchImages = mutableStateOf<List<ImageModel>>(emptyList())
+
+    var searchQuery by mutableStateOf("")
+
+    private var searchJob: Job? = null
+    fun onSearch(query: String) {
+        isLoading = true
+        searchQuery = query
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(500L)
+            try {
+                val response = repository.searchImages(apiKey, query, 1)
+                response.body()?.let { searchResult ->
+                    isLoading = false
+                    resetImageState()
+                    searchImages.value = searchResult.results.map { it.toImageModel() }
+                }
+            } catch (e: HttpException) {
+                isLoading = false
+                e.printStackTrace()
+                _eventFlow.emit(UIEvent.ShowSnackBar("Something went wrong"))
+            } catch (e: IOException) {
+                isLoading = false
+                e.printStackTrace()
+                _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
+            }
+        }
+    }
+
+    val searchPage = mutableStateOf(1)
+    private var searchImageScrollPosition = 0
+
+    private fun incrementSearchPage() {
+        searchPage.value = searchPage.value + 1
+    }
+
+    fun onChangeSearchScrollPosition(position: Int) {
+        searchImageScrollPosition = position
+    }
+
+    private fun appendSearchImages(images: List<ImageModel>) {
+        val current = ArrayList(this.searchImages.value)
+        current.addAll(images)
+        this.searchImages.value = current
+    }
+
     fun resetImageState() {
-        page.value = 1
-        onChangeScrollPosition(0)
+        searchPage.value = 1
+        onChangeSearchScrollPosition(0)
+    }
+
+    fun nextSearchPage() = viewModelScope.launch {
+        if ((searchImageScrollPosition + 1) >= (searchPage.value * PAGE_SIZE)) {
+            isLoading = true
+            incrementSearchPage()
+            if (searchPage.value > 1) {
+                try {
+                    val response = repository.searchImages(apiKey, searchQuery, searchPage.value)
+                    response.body()?.let { searchResult ->
+                        appendSearchImages(searchResult.results.map { it.toImageModel() })
+                        isLoading = false
+                    }
+                } catch (e: HttpException) {
+                    isLoading = false
+                    e.printStackTrace()
+                    _eventFlow.emit(UIEvent.ShowSnackBar("Something went wrong"))
+                } catch (e: IOException) {
+                    isLoading = false
+                    e.printStackTrace()
+                    _eventFlow.emit(UIEvent.ShowSnackBar("Check your internet connection"))
+                }
+            }
+        }
     }
 
     sealed class UIEvent {

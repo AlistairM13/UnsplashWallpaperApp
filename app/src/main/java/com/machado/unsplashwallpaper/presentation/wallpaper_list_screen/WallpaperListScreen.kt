@@ -56,7 +56,7 @@ fun WallpaperListScreen(
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             viewModel.setSelectedImage(image)
-                            navController.navigate(Screens.WallpaperDetailScreens.route)
+                            navController.navigate(Screens.WallpaperDetailScreen.route)
                         }
                 )
             }

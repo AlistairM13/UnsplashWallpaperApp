@@ -1,6 +1,5 @@
 package com.machado.unsplashwallpaper.data.remote.dto
 
-import com.machado.unsplashwallpaper.data.db.entities.ImageEntity
 import com.machado.unsplashwallpaper.domain.model.ImageModel
 
 data class ImageDto(
@@ -19,13 +18,6 @@ data class ImageDto(
     val user: User,
     val width: Int
 ) {
-    fun toImageEntity(): ImageEntity {
-        return ImageEntity(
-            id = id,
-            url = urls.regular
-        )
-    }
-
     fun toImageModel(): ImageModel {
         return ImageModel(
             id = id,
@@ -34,7 +26,7 @@ data class ImageDto(
         )
     }
 
-    fun getDownloadUrl(): String {
+    private fun getDownloadUrl(): String {
         val url = urls.regular
         val imageId = id
         val createdBy = user.name.lowercase().split(" ").joinToString("-")

@@ -6,13 +6,15 @@ import com.machado.unsplashwallpaper.domain.model.ImageModel
 
 @Entity
 data class ImageEntity(
-   @PrimaryKey val id: String,
-    val url: String
+    @PrimaryKey val id: String,
+    val url: String,
+    val downloadUrl: String
 ) {
     fun toImageModel(): ImageModel {
         return ImageModel(
             id = id,
-            url = url
+            url = url,
+            downloadUrl = downloadUrl
         )
     }
 }

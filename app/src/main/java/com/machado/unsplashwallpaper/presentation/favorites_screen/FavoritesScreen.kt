@@ -39,7 +39,7 @@ fun FavoritesScreen(navController: NavHostController, viewModel: UnsplashViewMod
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             viewModel.setSelectedImage(it.toImageModel())
-                            navController.navigate(Screens.WallpaperDetailScreens.route)
+                            navController.navigate(Screens.WallpaperDetailScreen.route)
                         }
                 )
             }

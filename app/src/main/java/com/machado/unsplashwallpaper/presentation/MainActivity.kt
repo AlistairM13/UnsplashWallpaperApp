@@ -37,16 +37,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.machado.unsplashwallpaper.presentation.favorites_screen.FavoritesScreen
+import com.machado.unsplashwallpaper.presentation.search_images.WallpaperSearchScreen
 import com.machado.unsplashwallpaper.presentation.theme.UnsplashWallpaperTheme
 import com.machado.unsplashwallpaper.presentation.wallpaper_detail_screen.WallpaperDetailScreen
 import com.machado.unsplashwallpaper.presentation.wallpaper_list_screen.WallpaperListScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 
-
-// secret key RxNgJfogQGqawWrpFfovbZvgOJazExVqVBtDEQ6nCcc
-// access key pmtX7wGq-0F-aGyjxop_J0Ki5cTrs-1mZLeQPudEntE
-// image = imageUrl&dl=username-imageId-unsplash.jpg
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -73,17 +70,24 @@ class MainActivity : ComponentActivity() {
                 }
 
                 var showBottomBar by rememberSaveable { mutableStateOf(true) }
+                var showTopBar by rememberSaveable { mutableStateOf(true) }
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
 
                 showBottomBar = when (navBackStackEntry?.destination?.route) {
-                    Screens.WallpaperDetailScreens.route -> false // on this screen bottom bar should be hidden
+                    Screens.WallpaperDetailScreen.route -> false // on this screen bottom bar should be hidden
                     else -> true // in all other cases show bottom bar
+                }
+                showTopBar = when (navBackStackEntry?.destination?.route) {
+                    Screens.WallpaperDetailScreen.route -> false
+                    Screens.FavoritesScreen.route -> false
+                    Screens.WallpaperSearchScreen.route -> false
+                    else -> true
                 }
                 val orderBy =
                     remember { mutableStateOf(UnsplashViewModel.ImageListOrder.POPULAR) }
                 Scaffold(
                     topBar = {
-                        Menu(viewModel = viewModel) {
+                        if (showTopBar) Menu(viewModel = viewModel) {
                             viewModel.resetImageState()
                             orderBy.value = it
                         }
@@ -93,23 +97,29 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController,
-                        startDestination = Screens.WallpaperListScreens.route,
+                        startDestination = Screens.WallpaperListScreen.route,
                         Modifier.padding(innerPadding)
                     ) {
-                        composable(Screens.WallpaperListScreens.route) {
+                        composable(Screens.WallpaperListScreen.route) {
                             WallpaperListScreen(
-                                navController,
-                                viewModel,
-                                orderBy.value
+                                navController = navController,
+                                viewModel = viewModel,
+                                orderBy = orderBy.value
                             )
                         }
-                        composable(Screens.FavoritesScreens.route) {
+                        composable(Screens.WallpaperSearchScreen.route) {
+                            WallpaperSearchScreen(
+                                viewModel = viewModel,
+                                navController = navController
+                            )
+                        }
+                        composable(Screens.FavoritesScreen.route) {
                             FavoritesScreen(
-                                navController,
-                                viewModel
+                                navController = navController,
+                                viewModel = viewModel
                             )
                         }
-                        composable(Screens.WallpaperDetailScreens.route) {
+                        composable(Screens.WallpaperDetailScreen.route) {
                             WallpaperDetailScreen(
                                 viewModel = viewModel
                             )
@@ -123,7 +133,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
-    val screens: List<Screens> = listOf(Screens.WallpaperListScreens, Screens.FavoritesScreens)
+    val screens: List<Screens> =
+        listOf(Screens.WallpaperListScreen, Screens.WallpaperSearchScreen, Screens.FavoritesScreen)
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
@@ -155,8 +166,6 @@ fun Menu(viewModel: UnsplashViewModel, orderBy: (UnsplashViewModel.ImageListOrde
     TopAppBar(
         title = { Text("Unsplash Wallpapers", color = Color.White) },
         actions = {
-
-
             // Creating Icon button for dropdown menu
             IconButton(onClick = { mDisplayMenu = !mDisplayMenu }) {
                 Icon(Icons.Default.MoreVert, "")
