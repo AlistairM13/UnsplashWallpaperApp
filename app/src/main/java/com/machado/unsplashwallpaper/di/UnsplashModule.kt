@@ -3,6 +3,8 @@ package com.machado.unsplashwallpaper.di
 import android.app.Application
 import androidx.room.Room
 import com.google.gson.GsonBuilder
+import com.machado.unsplashwallpaper.BuildConfig
+
 import com.machado.unsplashwallpaper.data.db.UnsplashDatabase
 import com.machado.unsplashwallpaper.data.remote.UnsplashService
 import com.machado.unsplashwallpaper.data.repository_Impl.UnsplashRepositoryImpl
@@ -44,7 +46,7 @@ object UnsplashModule {
     @Singleton
     @Named("api_key")
     fun providesApiKey(): String {
-        return "pmtX7wGq-0F-aGyjxop_J0Ki5cTrs-1mZLeQPudEntE"
+        return BuildConfig.API_KEY
     }
 
     @Provides
